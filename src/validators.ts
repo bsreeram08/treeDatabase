@@ -109,13 +109,12 @@ export function validateQuery(query: IQuery) {
     ...queryTypeError,
     ...queryValidator,
   ];
-  if (errors.length > 0) {
+  if (errors.length > 0)
     throw new Error(
       `Cannot process the query for the request, the query must comply with : [${errors.join(
         ',',
       )}]`,
     );
-  }
 }
 
 export function validateQueryOperation(o: Operation) {
@@ -126,6 +125,5 @@ export function validateQueryOperation(o: Operation) {
         ',',
       )}]`,
     );
-
   return errors;
 }

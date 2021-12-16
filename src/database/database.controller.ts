@@ -23,15 +23,13 @@ export class DatabaseController {
         const tables = create.tables;
         if (tables === null || tables === undefined) return res;
         else if (tables.length === 0) return res;
-        else {
+        else
           tables.forEach((v: ICreateTable) => {
             validateCreateTable(v);
-            if (!checkDatabase(v.database.name)) {
+            if (!checkDatabase(v.database.name))
               throw new Error('Database does not exist.');
-            }
             this.ts.createTable(v);
           });
-        }
       }
       return res;
     } catch (e) {

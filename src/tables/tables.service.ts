@@ -1,9 +1,5 @@
-/*
-https://docs.nestjs.com/providers#services
-*/
-
 import { Injectable } from '@nestjs/common';
-import { putToLru } from 'src/libs/cache';
+import { putToLru } from '../libs/cache';
 import { composeError, composeSuccess } from '../compose';
 import {
   ICreateTable,
@@ -29,9 +25,8 @@ export class TablesService {
   createTable(t: ICreateTable): IStatus {
     const st = new Date();
     const ct = createTable(t.database.name, t.name);
-    if (!ct) {
-      return composeError('Table could not be created.', st);
-    }
+    if (!ct) return composeError('Table could not be created.', st);
+
     const res = createEntries(t.database.name, t.name, t.entries);
     if (res) {
       updateDatabaseMetaData(t);
@@ -60,9 +55,8 @@ export class TablesService {
       const isPresent =
         selectKeys.every(v => columns.includes(v)) &&
         whereKeys.every(v => columns.includes(v));
-      if (!isPresent) {
-        throw new Error('Not a valid query.');
-      }
+      if (!isPresent) throw new Error('Not a valid query.');
+
       let data: any[] = getDataFromDB(database, table);
       if (whereKeys.length != 0)
         data = data.filter(v => {
@@ -107,9 +101,7 @@ export class TablesService {
       const isPresent =
         updateKeys.every(v => columnName.includes(v)) &&
         whereKeys.every(v => columnName.includes(v));
-      if (!isPresent) {
-        throw new Error('Not a valid Query.');
-      }
+      if (!isPresent) throw new Error('Not a valid Query.');
       let valid = true;
       columns
         .filter(v => updateKeys.includes(v.name))
@@ -118,10 +110,8 @@ export class TablesService {
             valid = false;
           }
         });
-
-      if (!valid) {
+      if (!valid)
         throw new Error(`Query is valid but the types of params don't match`);
-      }
       updateDataToDB(database, table, data, where);
       return composeSuccess('Data Updated Successfully', st);
     } catch (e) {
@@ -139,9 +129,7 @@ export class TablesService {
       const columnName: string[] = columns.map(v => v.name);
       const createKeys = Object.keys(data);
       const isPresent = createKeys.every(v => columnName.includes(v));
-      if (!isPresent) {
-        throw new Error('Now a valid Query.');
-      }
+      if (!isPresent) throw new Error('Now a valid Query.');
       let valid = true;
       columns
         .filter(v => createKeys.includes(v.name))
@@ -150,9 +138,8 @@ export class TablesService {
             valid = false;
           }
         });
-      if (!valid) {
+      if (!valid)
         throw new Error(`Query is valid but the types of params don't match`);
-      }
       addDataToDb(database, table, data);
       return composeSuccess('Data Created Successfully', st);
     } catch (e) {

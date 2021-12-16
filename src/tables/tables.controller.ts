@@ -1,7 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import { Body, Controller, Delete, Post } from '@nestjs/common';
 import { getFromLru } from '../libs/cache';
 import { composeError, composeSuccess } from '../compose';
