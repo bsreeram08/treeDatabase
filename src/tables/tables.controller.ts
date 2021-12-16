@@ -25,6 +25,7 @@ export class TablesController {
   constructor(private ts: TablesService) {}
   @Post('create')
   createTable(@Body() table: ICreateTable): IStatus {
+    const st = new Date();
     try {
       validateCreateTable(table);
       if (!checkDatabase(table.database.name)) {
@@ -32,12 +33,13 @@ export class TablesController {
       }
       return this.ts.createTable(table);
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
 
   @Delete()
   deleteTable(@Body() table: ITable): IStatus {
+    const st = new Date();
     try {
       validateTable(table);
       if (!checkDatabase(table.database.name))
@@ -46,12 +48,13 @@ export class TablesController {
         throw new Error('Table does not Exist.');
       return this.ts.deleteTable(table);
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
 
   @Post('query')
   execQuery(@Body() query: IQuery): IStatus {
+    const st = new Date();
     try {
       validateQuery(query);
       if (!checkDatabase(query.database.name))
@@ -65,7 +68,7 @@ export class TablesController {
         resFromLru != undefined &&
         resFromLru.length !== 0
       ) {
-        return composeSuccess('Data fetched from Cache', {
+        return composeSuccess('Data fetched from Cache', st, {
           data: { read: JSON.parse(resFromLru) },
         });
       }
@@ -82,7 +85,7 @@ export class TablesController {
           );
       }
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
 }

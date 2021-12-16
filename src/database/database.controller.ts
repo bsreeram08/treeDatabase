@@ -15,6 +15,7 @@ export class DatabaseController {
   constructor(private ds: DatabaseService, private ts: TablesService) {}
   @Post('create')
   createDatabase(@Body() create: ICreateDatabase) {
+    const st = new Date();
     try {
       validateCreateDatabase(create);
       const res = this.ds.createDatabase(create);
@@ -34,16 +35,17 @@ export class DatabaseController {
       }
       return res;
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
   @Delete('')
   DeleteDatabase(@Body() create: IName) {
+    const st = new Date();
     try {
       validateString(create.name);
       return this.ds.deleteDatabase(create);
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
 }

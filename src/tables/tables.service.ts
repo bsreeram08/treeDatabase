@@ -26,24 +26,27 @@ import {
 @Injectable()
 export class TablesService {
   createTable(t: ICreateTable): IStatus {
+    const st = new Date();
     const ct = createTable(t.database.name, t.name);
     if (!ct) {
-      return composeError('Table could not be created.');
+      return composeError('Table could not be created.', st);
     }
     const res = createEntries(t.database.name, t.name, t.entries);
     if (res) {
       updateDatabaseMetaData(t);
-      return composeSuccess('Table Created Successfully.');
+      return composeSuccess('Table Created Successfully.', st);
     }
-    return composeError('Table could not be created.');
+    return composeError('Table could not be created.', st);
   }
 
   deleteTable(t: ITable): IStatus {
+    const st = new Date();
     return deleteTable(t.database.name, t.name)
-      ? composeSuccess('Table deleted Successfully.')
-      : composeError('Table could not be deleted.');
+      ? composeSuccess('Table deleted Successfully.', st)
+      : composeError('Table could not be deleted.', st);
   }
   readData(query: IQuery): IStatus {
+    const st = new Date();
     try {
       const database = query.database.name;
       const table = query.table.name;
@@ -79,16 +82,17 @@ export class TablesService {
           return x;
         });
       putToLru(query, JSON.stringify(data));
-      return composeSuccess('Query read successfully.', {
+      return composeSuccess('Query read successfully.', st, {
         data: {
           read: data,
         },
       });
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
   updateData(query: IQuery): IStatus {
+    const st = new Date();
     try {
       const database = query.database.name;
       const table = query.table.name;
@@ -105,12 +109,13 @@ export class TablesService {
         throw new Error('Now a valid Query.');
       }
       updateDataToDB(database, table, data, where);
-      return composeSuccess('Data Updated Successfully');
+      return composeSuccess('Data Updated Successfully', st);
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
   create(query: IQuery): IStatus {
+    const st = new Date();
     try {
       const database = query.database.name;
       const table = query.table.name;
@@ -123,9 +128,9 @@ export class TablesService {
         throw new Error('Now a valid Query.');
       }
       addDataToDb(database, table, data);
-      return composeSuccess('Data Created Successfully');
+      return composeSuccess('Data Created Successfully', st);
     } catch (e) {
-      return composeError(e.message);
+      return composeError(e.message, st);
     }
   }
 }

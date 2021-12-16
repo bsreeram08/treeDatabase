@@ -10,6 +10,7 @@ import { createDatabase, deleteDatabase } from '../libs/database';
 @Injectable()
 export class DatabaseService {
   createDatabase(db: IName) {
+    const st = new Date();
     const name: string = db.name;
     const md: IDatabaseFileEntries = {
       metadata: {
@@ -21,15 +22,16 @@ export class DatabaseService {
     };
     const res = createDatabase(name, md);
     return res
-      ? composeSuccess('Created Database Successfully.')
-      : composeError('Could not create the database.');
+      ? composeSuccess('Created Database Successfully.', st)
+      : composeError('Could not create the database.', st);
   }
 
   deleteDatabase(db: IName) {
+    const st = new Date();
     const name: string = db.name;
     const res = deleteDatabase(name);
     return res
-      ? composeSuccess('Deleted Database Successfully.')
-      : composeError('Could not delete the database.');
+      ? composeSuccess('Deleted Database Successfully.', st)
+      : composeError('Could not delete the database.', st);
   }
 }
