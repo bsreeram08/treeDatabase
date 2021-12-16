@@ -7,6 +7,7 @@ import { putToLru } from 'src/libs/cache';
 import { composeError, composeSuccess } from '../compose';
 import {
   ICreateTable,
+  IEntries,
   IQuery,
   IStatus,
   ITable,
@@ -99,14 +100,27 @@ export class TablesService {
       const where = query.query.where;
       const data = query.query.update;
       const metaData: ITableMetadata = getTableMetadata(database, table);
-      const columns: string[] = metaData.columns.map(v => v.name);
+      const columns: IEntries[] = metaData.columns.map(v => v);
+      const columnName = columns.map(v => v.name);
       const updateKeys = Object.keys(data);
       const whereKeys = Object.keys(where);
       const isPresent =
-        updateKeys.every(v => columns.includes(v)) &&
-        whereKeys.every(v => columns.includes(v));
+        updateKeys.every(v => columnName.includes(v)) &&
+        whereKeys.every(v => columnName.includes(v));
       if (!isPresent) {
-        throw new Error('Now a valid Query.');
+        throw new Error('Not a valid Query.');
+      }
+      let valid = true;
+      columns
+        .filter(v => updateKeys.includes(v.name))
+        .forEach(v => {
+          if (typeof data[v.name] !== v.type) {
+            valid = false;
+          }
+        });
+
+      if (!valid) {
+        throw new Error(`Query is valid but the types of params don't match`);
       }
       updateDataToDB(database, table, data, where);
       return composeSuccess('Data Updated Successfully', st);
@@ -121,11 +135,23 @@ export class TablesService {
       const table = query.table.name;
       const data = query.query.create;
       const metaData: ITableMetadata = getTableMetadata(database, table);
-      const columns: string[] = metaData.columns.map(v => v.name);
+      const columns: IEntries[] = metaData.columns.map(v => v);
+      const columnName: string[] = columns.map(v => v.name);
       const createKeys = Object.keys(data);
-      const isPresent = createKeys.every(v => columns.includes(v));
+      const isPresent = createKeys.every(v => columnName.includes(v));
       if (!isPresent) {
         throw new Error('Now a valid Query.');
+      }
+      let valid = true;
+      columns
+        .filter(v => createKeys.includes(v.name))
+        .forEach(v => {
+          if (typeof data[v.name] !== v.type) {
+            valid = false;
+          }
+        });
+      if (!valid) {
+        throw new Error(`Query is valid but the types of params don't match`);
       }
       addDataToDb(database, table, data);
       return composeSuccess('Data Created Successfully', st);
