@@ -62,15 +62,17 @@ export class TablesController {
       if (!checkTable(query.table.name, query.database.name))
         throw new Error('Table does not exist.');
       const querySelector: Operation = query.operation;
-      const resFromLru = getFromLru(query);
-      if (
-        resFromLru != null &&
-        resFromLru != undefined &&
-        resFromLru.length !== 0
-      ) {
-        return composeSuccess('Data fetched from Cache', st, {
-          data: { read: JSON.parse(resFromLru) },
-        });
+      if (querySelector === 'read') {
+        const resFromLru = getFromLru(query);
+        if (
+          resFromLru != null &&
+          resFromLru != undefined &&
+          resFromLru.length !== 0
+        ) {
+          return composeSuccess('Data fetched from Cache', st, {
+            data: { read: JSON.parse(resFromLru) },
+          });
+        }
       }
       switch (querySelector) {
         case 'create':
